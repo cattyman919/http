@@ -1,4 +1,7 @@
 #include "server.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 int main() {
 
@@ -17,7 +20,7 @@ int main() {
   int fd_size = 5;
   struct pollfd *pfds = malloc(sizeof *pfds * fd_size);
 
-  printf("Setting up socket...\n");
+  printf("Setting up HTTP socket...\n");
   // Set up and get a listening socket
   listener = get_listener_socket();
 
@@ -26,7 +29,7 @@ int main() {
     exit(1);
   }
 
-  printf("Listening on localhost:%s\n", PORT);
+  printf("Listening on localhost:%s\n\n", PORT);
   // Add the listener to set
   pfds[0].fd = listener;
   pfds[0].events = POLLIN; // Report ready to read on incoming connection
@@ -88,10 +91,10 @@ int main() {
             del_from_pfds(pfds, i, &fd_count);
 
           } else {
-
             printf("[LOG] Sending html files to socket %d\n", sender_fd);
             handle_client(sender_fd, buf);
             del_from_pfds(pfds, i, &fd_count);
+            printf("[LOG] Close client socket %d \n\n", sender_fd);
           }
         }
       }

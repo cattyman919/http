@@ -1,4 +1,15 @@
 #include "server.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/sendfile.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+#include <fcntl.h>
+#include <netdb.h>
+#include <netinet/in.h>
 
 // Get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa) {
@@ -84,12 +95,69 @@ void del_from_pfds(struct pollfd pfds[], int i, int *fd_count) {
   (*fd_count)--;
 }
 
+char *render_static_file(char *fileName) {
+  FILE *file = fopen(fileName, "r");
+
+  if (file == NULL) {
+    return NULL;
+  }
+
+  fseek(file, 0, SEEK_END);
+  long fsize = ftell(file);
+  fseek(file, 0, SEEK_SET);
+
+  char *temp = malloc(sizeof(char) * (fsize + 1));
+  char ch;
+  int i = 0;
+  while ((ch = fgetc(file)) != EOF) {
+    temp[i] = ch;
+    i++;
+  }
+  fclose(file);
+  return temp;
+}
+
 void handle_client(int clientfd, char buf[]) {
-  // GET /file.html
-  char *f = buf + 5;
-  *strchr(f, ' ') = 0;
-  int opened_fd = open(f, O_RDONLY);
-  sendfile(clientfd, opened_fd, 0, sizeof(&buf));
-  close(opened_fd);
+
+  printf("buffer : %s\n", buf);
+
+  // Parsing client HTTP request
+  char *method = "";
+  char *urlRoute = "";
+  char *client_http_header = strtok(buf, "\n");
+
+  printf("[LOG] Client HTTP Header: %s\n", client_http_header);
+  char *header_token = strtok(client_http_header, " ");
+
+  int header_parse_counter = 0;
+  while (header_token != NULL) {
+
+    switch (header_parse_counter) {
+    case 0:
+      method = header_token;
+    case 1:
+      urlRoute = header_token;
+    }
+    header_token = strtok(NULL, " ");
+    header_parse_counter++;
+  }
+
+  printf("[LOG] Client HTTP Method: %s\n", method);
+  printf("[LOG] Client HTTP URL: %s\n", urlRoute);
+
+  // Send Response
+  // Send HTML File
+  char *response_data = render_static_file("templates/index.html");
+
+  // {Status Line} \r\n {Headers} \r\n {Body}
+  char res[BUFFER_SIZE * 4] = "HTTP/1.1 200 OK\r\n\r\n";
+  strcat(res, response_data);
+  strcat(res, "\r\n\r\n");
+
+  printf("[LOG] Response : %s\n", res);
+
+  send(clientfd, res, sizeof(res), 0);
   close(clientfd);
+
+  free(response_data);
 }
