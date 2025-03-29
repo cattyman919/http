@@ -1,4 +1,5 @@
 #include "server.h"
+#include "routes.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -117,9 +118,9 @@ char *render_static_file(char *fileName) {
   return temp;
 }
 
-void handle_client(int clientfd, char buf[]) {
+void handle_client(int clientfd, char buf[], Route *root) {
 
-  printf("buffer : %s\n", buf);
+  printf("[LOG] HTTP Request :\n%s", buf);
 
   // Parsing client HTTP request
   char *method = "";
@@ -135,8 +136,10 @@ void handle_client(int clientfd, char buf[]) {
     switch (header_parse_counter) {
     case 0:
       method = header_token;
+      break;
     case 1:
       urlRoute = header_token;
+      break;
     }
     header_token = strtok(NULL, " ");
     header_parse_counter++;
@@ -145,16 +148,28 @@ void handle_client(int clientfd, char buf[]) {
   printf("[LOG] Client HTTP Method: %s\n", method);
   printf("[LOG] Client HTTP URL: %s\n", urlRoute);
 
-  // Send Response
-  // Send HTML File
-  char *response_data = render_static_file("templates/index.html");
+  // Find the HTML file based on the URL Route
+  char template[100] = "templates/";
+
+  printf("[LOG] Searching path...\n");
+
+  Route *destination = search(root, urlRoute);
+  if (destination == NULL)
+    strcat(template, "404.html");
+  else
+    strcat(template, destination->value);
+
+  printf("[LOG] Path : %s\n", template);
+
+  // Render the HTML file as characters
+  char *response_data = render_static_file(template);
 
   // {Status Line} \r\n {Headers} \r\n {Body}
   char res[BUFFER_SIZE * 4] = "HTTP/1.1 200 OK\r\n\r\n";
   strcat(res, response_data);
   strcat(res, "\r\n\r\n");
 
-  printf("[LOG] Response : %s\n", res);
+  printf("[LOG] HTTP Response :\n%s", res);
 
   send(clientfd, res, sizeof(res), 0);
   close(clientfd);

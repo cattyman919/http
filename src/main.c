@@ -1,3 +1,4 @@
+#include "routes.h"
 #include "server.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,8 +21,8 @@ int main() {
   int fd_size = 5;
   struct pollfd *pfds = malloc(sizeof *pfds * fd_size);
 
-  printf("Setting up HTTP socket...\n");
   // Set up and get a listening socket
+  printf("Setting up HTTP socket...\n");
   listener = get_listener_socket();
 
   if (listener == -1) {
@@ -30,6 +31,13 @@ int main() {
   }
 
   printf("Listening on localhost:%s\n\n", PORT);
+
+  // Routing Setup
+  Route *root = initRoute("/", "index.html");
+  addRoute(root, "/about", "about.html");
+
+  print_inorder(root);
+
   // Add the listener to set
   pfds[0].fd = listener;
   pfds[0].events = POLLIN; // Report ready to read on incoming connection
@@ -91,8 +99,7 @@ int main() {
             del_from_pfds(pfds, i, &fd_count);
 
           } else {
-            printf("[LOG] Sending html files to socket %d\n", sender_fd);
-            handle_client(sender_fd, buf);
+            handle_client(sender_fd, buf, root);
             del_from_pfds(pfds, i, &fd_count);
             printf("[LOG] Close client socket %d \n\n", sender_fd);
           }

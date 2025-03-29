@@ -7,14 +7,14 @@ This is my very own custom HTTP server written in C
 - Polling to handle multiple connections
 - HTTP Parsing
 - HTTP Response Header
+- Routing
+- 404 Not found
 
 # To-Do
 
-- Routing
 - Echo
 - HTTP caching
 - Multi-threading (Or maybe I/O non-blocking is enough?)
-- 404 Not found
 
 # References
 
