@@ -1,0 +1,12 @@
+[
+  {
+    "directory": "/home/senohebat/Documents/03_Code/socket/http",
+    "command": "clang -Iinclude -c src/main.c -o src/main.o",
+    "file": "src/main.c"
+  },
+  {
+    "directory": "/home/senohebat/Documents/03_Code/socket/http",
+    "command": "clang -Iinclude -c src/server.c -o src/server.o",
+    "file": "src/server.c"
+  }
+]
