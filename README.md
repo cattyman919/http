@@ -2,6 +2,8 @@
 
 This is my very own custom HTTP server written in C
 
+Target: Linux
+
 # Features
 
 - Polling to handle multiple connections
