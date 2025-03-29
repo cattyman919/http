@@ -1,5 +1,4 @@
 #include "server.h"
-#include <stdio.h>
 
 int main() {
 
@@ -9,12 +8,11 @@ int main() {
   struct sockaddr_storage remoteaddr; // Client address
   socklen_t addrlen;
 
-  char buf[256]; // Buffer for client data
+  char buf[BUFFER_SIZE]; // Buffer for client data
 
   char remoteIP[INET6_ADDRSTRLEN];
 
   // Start off with room for 5 connections
-  // (We'll realloc as necessary)
   int fd_count = 0;
   int fd_size = 5;
   struct pollfd *pfds = malloc(sizeof *pfds * fd_size);

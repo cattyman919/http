@@ -2,16 +2,19 @@
 #define Server_h
 
 #include <arpa/inet.h>
+#include <fcntl.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <poll.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/sendfile.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+#define BUFFER_SIZE 1024
 #define PORT "8080" // Port we're listening on
 
 void *get_in_addr(struct sockaddr *sa);

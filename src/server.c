@@ -1,8 +1,4 @@
 #include "server.h"
-#include <fcntl.h>
-#include <stdio.h>
-#include <sys/sendfile.h>
-#include <unistd.h>
 
 // Get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa) {
@@ -93,7 +89,7 @@ void handle_client(int clientfd, char buf[]) {
   char *f = buf + 5;
   *strchr(f, ' ') = 0;
   int opened_fd = open(f, O_RDONLY);
-  sendfile(clientfd, opened_fd, 0, 256);
+  sendfile(clientfd, opened_fd, 0, sizeof(&buf));
   close(opened_fd);
   close(clientfd);
 }
