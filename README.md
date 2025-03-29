@@ -9,7 +9,7 @@ Target: Linux
 - Polling to handle multiple connections
 - HTTP Parsing
 - HTTP Response Header
-- Routing
+- Routing (using Binary Search Tree)
 - 404 Not found
 
 # To-Do

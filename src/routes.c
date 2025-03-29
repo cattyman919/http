@@ -17,7 +17,7 @@ Route *initRoute(char *key, char *value) {
 Route *addRoute(Route *root, char *key, char *value) {
 
   if (root == NULL) {
-    printf("[ROUTE LOG] root not exist, creating route for %s -> %s\n", key,
+    printf("[ROUTE LOG] Root not exist, creating route for %s -> %s\n", key,
            value);
     Route *tmp = initRoute(key, value);
     return tmp;
@@ -37,12 +37,12 @@ Route *search(Route *root, char *key) {
   printf("[ROUTE LOG] Seaching routes...\n");
 
   if (root == NULL) {
-    printf("[ROUTE LOG] root does not exist for key: %s\n", key);
+    printf("[ROUTE LOG] Root does not exist for key: %s\n", key);
     return NULL;
   }
 
   if (strcmp(key, root->key) == 0) {
-    printf("[ROUTE LOG] root found for key %s\n", key);
+    printf("[ROUTE LOG] Root found for key %s\n", key);
     return root;
   } else if (strcmp(key, root->key) > 0)
     return search(root->right, key);

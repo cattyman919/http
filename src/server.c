@@ -97,9 +97,12 @@ void del_from_pfds(struct pollfd pfds[], int i, int *fd_count) {
 }
 
 char *render_static_file(char *fileName) {
+  printf("[FILE LOG] Reading file %s\n", fileName);
+
   FILE *file = fopen(fileName, "r");
 
   if (file == NULL) {
+    fprintf(stderr, "[ERROR] File %s does not exist \n", fileName);
     return NULL;
   }
 
@@ -161,13 +164,20 @@ void handle_client(int clientfd, char buf[], Route *root) {
 
   printf("[LOG] Path : %s\n", template);
 
+  // {Status Line} \r\n {Headers} \r\n {Body}
+  char res[BUFFER_SIZE * 4] = "";
+
   // Render the HTML file as characters
   char *response_data = render_static_file(template);
 
-  // {Status Line} \r\n {Headers} \r\n {Body}
-  char res[BUFFER_SIZE * 4] = "HTTP/1.1 200 OK\r\n\r\n";
-  strcat(res, response_data);
-  strcat(res, "\r\n\r\n");
+  if (response_data == NULL) {
+    fprintf(stderr, "[ERROR] File %s.html is not implemented\n", urlRoute);
+    strcat(res, "HTTP/1.1 501 Not Implemented\r\n\r\n");
+  } else {
+    strcat(res, "HTTP/1.1 200 OK\r\n\r\n");
+    strcat(res, response_data);
+    strcat(res, "\r\n\r\n");
+  }
 
   printf("[LOG] HTTP Response :\n%s", res);
 
